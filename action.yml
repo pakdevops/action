@@ -1,25 +1,34 @@
-name: 'TESPKG Hello World'
-description: 'Greet someone'
+name: 'push_incubator_chart'
+description: 'push_incubator_chart'
 inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
+  ALIAS_GITHUB_REPOSITORY:
+    description: 'ALIAS_GITHUB_REPOSITORY'
     required: true
-    default: 'World'
-outputs:
-  random-number:
-    description: "Random number"
-    value: ${{ steps.random-number-generator.outputs.random-id }}
+    default: ${{ github.repository }}  
+  TES_ENV:
+    description: 'environment for deployment'
+    required: false
+    default: dev
+  HELM_REPO:
+    description: 'HELM_REPO'
+    required: false
+    default: 'http://charts.fiberdoctor.pk:8080/'
+  HELM_USER:
+    description: 'HELM_USER'
+    required: false
+    default: root
+  HELM_PASSWORD:
+    description: 'HELM_PASSWORD'
+    required: false
+    default: root
 runs:
   using: "composite"
   steps:
-    - run: echo Hello ${{ inputs.who-to-greet }}.
+    - run: ${{ github.action_path }}/push_incubator_chart.sh
       shell: bash
-    - id: random-number-generator
-      run: echo "::set-output name=random-id::$(echo $RANDOM)"
-      shell: bash
-    - run: ${{ github.action_path }}/goodbye.sh
-      shell: bash
-    - run: ${{ github.action_path }}/install_yq_helm.sh
-      shell: bash
-    - run: ${{ github.action_path }}/deploy_to_dev.sh
-      shell: bash
+      env:
+        TES_ENV: ${{ inputs.TES_ENV }}
+        HELM_REPO: ${{ inputs.HELM_REPO }}
+        HELM_USER: ${{ inputs.HELM_USER }}
+        HELM_PASSWORD: ${{ inputs.HELM_PASSWORD }}
+        ALIAS_GITHUB_REPOSITORY: ${{ inputs.ALIAS_GITHUB_REPOSITORY }}        
